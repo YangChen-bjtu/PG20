@@ -51,7 +51,7 @@ REE(k)    = norm(out_k.B-data.Bopt,'fro')^2/NBopt;
     TN(k)     = length(intersect(out_k.F,data.F));
     t(k)=out_k.time;
 end
-TPR      = TP./(TP+FN);
+    TPR      = TP./(TP+FN);
     FPR      = FP./(FP+TN);
     TSS      = TPR-FPR;
 fprintf('\n Sample size:       n=%d, p=%d ,s=%d\n',n,p,s);

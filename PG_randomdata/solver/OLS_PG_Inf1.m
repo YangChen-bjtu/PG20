@@ -25,13 +25,13 @@ function out = OLS_PG_Inf1(p, q, lam, func, pars)
 %%%%%%%    Warning: Accuracy may not be guaranteed!!!!!              %%%%%%
 warning off;
 
-if nargin<3; error('Imputs are not enough!\n'); end
-if nargin<4; pars=[]; end
+if nargin<4; error('Imputs are not enough!\n'); end
+if nargin<5; pars=[]; end
 if isfield(pars,'iteron');iteron = pars.iteron; else; iteron = 1;        end
 if isfield(pars,'maxit'); maxit  = pars.maxit;  else; maxit  = 1e4;      end
 if isfield(pars,'tol');   tol    = pars.tol;    else; tol = 1e-6*sqrt(p);end  
 
-BO     =zeros(p,q);
+BO     = zeros(p,q);
 B_k    = BO;
 eta    = 2;
 obj    = zeros(maxit,1);
@@ -48,7 +48,7 @@ for iter=1:maxit
     obj(iter) = f_k+lam*sum(norm_Inf(B_k));
     L0     = 1;
     L_k    = L0;  
-    for iter_L  = 1:20       
+    for iter_L  = 1:10       
          B = proximal_Inf1(p,q,B_k-g_k/L_k,lam/L_k);
          f = func(B);
         if f <= f_k+trace(g_k'*(B-B_k))+0.5*L_k*norm(B-B_k,'fro')^2
@@ -57,7 +57,7 @@ for iter=1:maxit
         L_k  = eta*L_k;
     end
     
-    % Stop criteria
+% Stop criteria
     residual =  L_k*norm(B-B_k,'fro');
 
     if iteron  
@@ -83,7 +83,7 @@ out.obj  = obj(1:iter);
 out.time = toc(t0);
 out.error= residual;
 end
-%proximal operator for g=\lam*\ell_{\infty,1}
+% solve the proximal operator for g=\lam*\ell_{\infty,1}
 function S = proximal_Inf1(p,q,B,a)
 B0   = zeros(p,q);
 b    = norm_1(B);
@@ -97,7 +97,7 @@ for i=1:p
     end
 end
 end
-
+% solve the \ell_1 norms of rows for a matrix
 function [b]=norm_1(B)
        p=size(B,1);
         z=zeros(p,1);
@@ -106,21 +106,23 @@ function [b]=norm_1(B)
             z(i)=bi;
        end
  b=z;
- end
+end
+% solve the projection on to the simplex
  function bopt = project(b)
  p = length(b);
-normal=ones(p,1);
-error=1e3;
+normal = ones(p,1);
+error = 1e3;
 threshold=1e-12;
- b0=b; 
+b0 = b; 
 while error>threshold
-  b1=b0-(1/p)*(sum(b0)-1)*normal;
-  b1=max(b1,0);
-  error=norm(b1-b0)^2;
-  b0=b1;
+  b1 = b0-(1/p)*(sum(b0)-1)*normal;
+  b1 = max(b1,0);
+  error = norm(b1-b0)^2;
+  b0 = b1;
 end
 bopt = b0;
  end
+% solve the \ell_\infty norms of rows for a matrix
  function [b]=norm_Inf(B)
        p=size(B,1);
         z=zeros(p,1);

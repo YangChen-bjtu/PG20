@@ -24,11 +24,11 @@ function out = PG_20(p, q, lam, func, pars)
 %%%%%%%    Warning: Accuracy may not be guaranteed!!!!!              %%%%%%
 warning off;
 
-if nargin<3; error('Imputs are not enough!\n'); end
-if nargin<4; pars=[]; end
+if nargin<4; error('Imputs are not enough!\n'); end
+if nargin<5; pars=[]; end
 if isfield(pars,'iteron');iteron = pars.iteron; else; iteron = 1;        end
 if isfield(pars,'maxit'); maxit  = pars.maxit;  else; maxit  = 1e5;      end
-if isfield(pars,'tol');   tol    = pars.tol;    else; tol = 1e-4;end  
+if isfield(pars,'tol');   tol    = pars.tol;    else; tol = 1e-4;        end  
 
 B0     = 0.01*ones(p,q);
 B_k    = B0;
@@ -87,7 +87,7 @@ out.time = toc(t0);
 out.error= residual;
 end
 
-%prox_{\lam*\ell_{2,0}}(x)
+% solve prox_{\lam*\ell_{2,0}}(x)
 function [H]=hard_threshold(p,q,B,lambda)
 B0=zeros(p,q);
 b =  norm_2(B);
@@ -99,7 +99,7 @@ for i=1:p
     end
 end
 end
-
+% solve the \ell_2 norms of rows for a matrix
  function [b]=norm_2(B)
  p=size(B,1);
 z=zeros(p,1);
